@@ -14,6 +14,8 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { ProjectPayload } from 'types'
 
+export const revalidate = 60 
+
 type Props = {
   params: { slug: string }
 }
