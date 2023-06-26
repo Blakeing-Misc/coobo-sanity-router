@@ -25,8 +25,9 @@ export default async function IndexRoute({
   const preview = draftMode().isEnabled ? { token: readToken! } : undefined
   const client = getClient(preview)
   const settings =
-    (await client.fetch<SettingsPayload | null>(settingsQuery)) ??
-    fallbackSettings
+    (await client.fetch<SettingsPayload | null>(settingsQuery, {
+      next: { revalidate: 60 },
+    })) ?? fallbackSettings
 
   const layout = (
     <div className="flex min-h-screen flex-col bg-white text-black">

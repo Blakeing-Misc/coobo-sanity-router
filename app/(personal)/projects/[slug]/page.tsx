@@ -14,8 +14,6 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { ProjectPayload } from 'types'
 
-export const revalidate = 60 
-
 type Props = {
   params: { slug: string }
 }
@@ -26,9 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const client = getClient(preview)
 
   const [homePageTitle, project] = await Promise.all([
-    client.fetch<string | null>(homePageTitleQuery),
+    client.fetch<string | null>(homePageTitleQuery, {
+      next: { revalidate: 60 },
+    }),
     client.fetch<ProjectPayload | null>(projectBySlugQuery, {
       slug,
+      next: { revalidate: 60 },
     }),
   ])
 
@@ -42,7 +43,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const client = getClient()
-  const slugs = await client.fetch<string[]>(projectPaths)
+  const slugs = await client.fetch<string[]>(projectPaths, {
+    next: { revalidate: 60 },
+  })
   return slugs.map((slug) => ({ slug }))
 }
 
@@ -52,6 +55,7 @@ export default async function ProjectSlugRoute({ params }: Props) {
   const client = getClient(preview)
   const data = await client.fetch<ProjectPayload | null>(projectBySlugQuery, {
     slug,
+    next: { revalidate: 60 },
   })
 
   if (!data && !preview) {

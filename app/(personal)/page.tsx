@@ -15,8 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const client = getClient(preview)
 
   const [settings, page] = await Promise.all([
-    client.fetch<SettingsPayload | null>(settingsQuery),
-    client.fetch<HomePagePayload | null>(homePageQuery),
+    client.fetch<SettingsPayload | null>(settingsQuery, {
+      next: { revalidate: 60 },
+    }),
+    client.fetch<HomePagePayload | null>(homePageQuery, {
+      next: { revalidate: 60 },
+    }),
   ])
 
   return defineMetadata({
@@ -29,7 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function IndexRoute() {
   const preview = draftMode().isEnabled ? { token: readToken! } : undefined
   const client = getClient(preview)
-  const data = await client.fetch<HomePagePayload | null>(homePageQuery)
+  const data = await client.fetch<HomePagePayload | null>(homePageQuery, {
+    next: { revalidate: 60 },
+  })
 
   if (!data && !preview) {
     notFound()
