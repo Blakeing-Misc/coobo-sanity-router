@@ -40,9 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const client = getClient()
-  const slugs = await client.fetch<string[]>(pagePaths, {
-    next: { revalidate: 60 },
-  })
+  const slugs = await client.fetch<string[]>(pagePaths, {})
   return slugs.map((slug) => ({ slug }))
 }
 
@@ -52,7 +50,6 @@ export default async function PageSlugRoute({ params }: Props) {
   const client = getClient(preview)
   const data = await client.fetch<PagePayload | null>(pagesBySlugQuery, {
     slug,
-    next: { revalidate: 60 },
   })
 
   if (!data && !preview) {
